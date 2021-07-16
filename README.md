@@ -24,6 +24,8 @@ Application: automatically generate summary or news title based on input content
     --train_data.json : training data for training
 
     --test_data.json : testing data for evaluating
+    
+    --cached_test_1020/cached_train_1020 : cached file for pytorch
 
 -output_dir_pre : location of output model 
 
