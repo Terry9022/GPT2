@@ -54,9 +54,9 @@ Input are train_text.txt and train_label.txt. Output are train_data.json and tes
 ------
 ### Application example
 
-![image](https://github.com/Terryb06109022/GPT2/blob/main/1.png)
+![image](1.png)
 
-![image](https://github.com/Terryb06109022/GPT2/blob/main/2.png)
+![image](2.png)
 
-![image](https://github.com/Terryb06109022/GPT2/blob/main/3.png)
+![image](3.png)
 
