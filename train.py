@@ -129,7 +129,7 @@ def train(model, device, train_data, test_data, args):
                         min_loss = eval_loss
                         print('Saving model (epoch = {:4d}, step = {:4d}, loss = {:.4f})'.format(iepoch + 1, global_step, min_loss))
                         # after each epoch, save the model
-                        output_dir = os.path.join(args.output_dir, "best_model")
+                        output_dir = os.path.join(args.output_dir, "output_dir_pre/best_model")
                         model_to_save = model.module if hasattr(model, "module") else model
                         model_to_save.save_pretrained(output_dir)
                         early_stop_cnt = 0

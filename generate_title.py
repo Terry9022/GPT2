@@ -9,20 +9,24 @@ from transformers import BertTokenizer
 import torch.nn.functional as F
 import copy
 
+
 def set_args():
     # the parameters for generating the title
     parser = argparse.ArgumentParser()
-    parser.add_argument('--device', default='0', type=str, help='the graphics card used when predicting, if using CPU, then set -1')
+    parser.add_argument('--device', default='0', type=str,
+                        help='the graphics card used when predicting, if using CPU, then set -1')
     parser.add_argument('--model_path', default='output_dir_pre/best_model', type=str, help='location path of model')
     parser.add_argument('--vocab_path', default='vocab/vocab.txt', type=str, help='location path of vocabulary')
     parser.add_argument('--batch_size', default=3, type=int, help='the number of generating title')
     parser.add_argument('--generate_max_len', default=120, type=int, help='the maximum length of generated title')
     parser.add_argument('--repetition_penalty', default=1.2, type=float, help='penalty of generating repeated words')
-    parser.add_argument('--top_k', default=3, type=float, help='number of top words with highest probability that we keep when decoding')
+    parser.add_argument('--top_k', default=3, type=float,
+                        help='number of top words with highest probability that we keep when decoding')
     parser.add_argument('--top_p', default=0.4, type=float, help='the probability threshold when decoding')
     parser.add_argument('--max_len', type=int, default=1020,
                         help='the maximum length of model input, it should be smaller than n_ctx of config')
     return parser.parse_args()
+
 
 def top_k_top_p_filter(logits, top_k, top_p, filter_value=-float("Inf")):
     """
@@ -42,7 +46,7 @@ def top_k_top_p_filter(logits, top_k, top_p, filter_value=-float("Inf")):
     if top_k > 0:
         # Because there are number of batch_size prediction outcomes, we get all the top_k tokens in every batch data
         for logit in logits:
-            indices_to_remove = logit < torch.topk(logit, top_k)[0][...,-1,None]
+            indices_to_remove = logit < torch.topk(logit, top_k)[0][..., -1, None]
             logit[indices_to_remove] = filter_value
     # if top_p is not 0, we keep token whose probability is smaller than top_p in the logits
     if top_p > 0.0:
@@ -50,11 +54,11 @@ def top_k_top_p_filter(logits, top_k, top_p, filter_value=-float("Inf")):
         sorted_logits, sorted_indices = torch.sort(logits, descending=True, dim=-1)
         # use softmax toward sorted result, then gain the cumulative probability
         # For example, [0.1, 0.2, 0.3, 0.4] turn into [0.1, 0.3, 0.6, 1.0]
-        cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim = -1), dim=-1)
+        cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
         # delete the token whose probability is higher than top_p
         sorted_indices_to_remove = cumulative_probs > top_p
-        sorted_indices_to_remove[...,1:] = sorted_indices_to_remove[...,:-1].clone()
-        sorted_indices_to_remove[...,0] = 0
+        sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
+        sorted_indices_to_remove[..., 0] = 0
         for index, logit in enumerate(logits):
             indices_to_remove = sorted_indices[index][sorted_indices_to_remove[index]]
             logit[indices_to_remove] = filter_value
@@ -99,14 +103,14 @@ def predict_one_sample(model, tokenizer, device, args, content):
         for _ in range(args.generate_max_len):
             outputs = model(input_ids=input_tensors, token_type_ids=token_type_tensors)
             # gain the last hidden layer, next_token_logits size：[batch_size, vocab_size]
-            next_token_logits = outputs[0][:,-1,:]
+            next_token_logits = outputs[0][:, -1, :]
             # iterate through batch_size, do the repetition penalty
             for index in range(args.batch_size):
                 for token_id in set([token_ids[index] for token_ids in generated]):
                     next_token_logits[index][token_id] /= args.repetition_penalty
             # iterate through batch_size, set UNK as infinite small
             for next_token_logit in next_token_logits:
-                next_token_logit[unk_id]= -float("Inf")
+                next_token_logit[unk_id] = -float("Inf")
             # use top_k_top_p_filtering function to filter the result
             filter_logits = top_k_top_p_filter(next_token_logits, top_k=args.top_k, top_p=args.top_p)
             # use probability to choose token from filter_logits
@@ -124,7 +128,7 @@ def predict_one_sample(model, tokenizer, device, args, content):
             if finish_flag:
                 break
             # add the predicted token to generated
-            generated.append([token.item() for token in next_tokens[:,0]])
+            generated.append([token.item() for token in next_tokens[:, 0]])
             # concat the last prediction to input_tensors and token_type_tensors, then use them all to continue to predict
             input_tensors = torch.cat((input_tensors, next_tokens), dim=-1)
             token_type_tensors = torch.cat((token_type_tensors, next_token_type), dim=-1)
@@ -143,6 +147,7 @@ def predict_one_sample(model, tokenizer, device, args, content):
             candidate_responses.append(
                 "".join(tokenizer.convert_ids_to_tokens(responses)).replace("##", "").replace("[space]", " "))
     return candidate_responses
+
 
 def main():
     args = set_args()
@@ -168,33 +173,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
