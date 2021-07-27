@@ -3,6 +3,7 @@
 
 import os
 import argparse
+import sys
 
 from core.gpt2app import GPT2App
 
@@ -34,10 +35,20 @@ def main():
     print('開始對新聞生成摘要，輸入 CTRL + Z 則退出')
     try:
         while True:
-            content = input("輸入的新聞正文為:")
-            titles = gpt2_app.generate(content=content, **args.__dict__)
-            for i, title in enumerate(titles):
-                print("生成的第{}個摘要為：{}".format(i + 1, title))
+            print("輸入的新聞正文為:")
+            content = sys.stdin.read()
+            content = content.strip()
+            if content == 'quit()':
+                break
+            if content:
+                print("\n生成中...")
+                titles = gpt2_app.generate(content=content, **args.__dict__)
+                for i, title in enumerate(titles):
+                    print("生成的第{}個摘要為：{}".format(i + 1, title))
+            else:
+                print("無內文")
+            print("-"*10)
+
     except:
         pass
 
