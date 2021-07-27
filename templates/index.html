@@ -16,7 +16,7 @@
     <header class="d-flex justify-content-center py-3">
         <ul class="nav nav-pills">
             <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">生成式摘要</a></li>
-            <li class="nav-item"><a href="docs" class="nav-link">APIs文件</a></li>
+            <li class="nav-item"><a href="docs" class="nav-link" target="_blank">APIs文件</a></li>
         </ul>
     </header>
 </div>
@@ -54,13 +54,14 @@
         return o;
     };
     $('#generate-btn').click(function (e) {
+        $(this).addClass("disabled")
+        $(this).text("生成中...")
         let rs_group_elem = $('#result');
-        rs_group_elem.empty();
         let input_form = $('#gpt2-form');
         let form_data = input_form.serializeObject()
         console.log(form_data)
         $.ajax({
-            url: "{{ url_for('generate summary api') }}",
+            url: "{{ url_for('generate-summary-api') }}",
             type: "POST",
             beforeSend: function (xhr, settings) {
                 xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
@@ -70,10 +71,14 @@
             data: JSON.stringify(form_data), // serializes the form's elements.
             success: function (data) {
                 console.log(data);
+                rs_group_elem.empty();
                 data.forEach(elem => {
                     console.log(elem);
                     rs_group_elem.append($(('<li class="list-group-item">')).text(elem));
                 });
+                let gen_btn = $('#generate-btn')
+                gen_btn.removeClass("disabled")
+                gen_btn.text("生成")
             }
         });
 

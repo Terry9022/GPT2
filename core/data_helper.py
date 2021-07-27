@@ -81,7 +81,7 @@ if __name__ == '__main__':
     content_path_dir = "data_dir/train_text.txt"
     title_path_dir = "data_dir/train_label.txt"
     train_save_path_dir = "data_dir/train_data.json"
-    test_save_path_dir = "data_dir/test_data.json"
+    test_save_path_dir = "../data_dir/test_data.json"
     build_news_data(content_path_dir, title_path_dir, train_save_path_dir, test_save_path_dir)
 
 
