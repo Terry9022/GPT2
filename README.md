@@ -53,7 +53,6 @@ Input are train_text.txt and train_label.txt. Output are train_data.json and tes
 
 ------
 ### Application example
-
 ![image](static/1.png)
 
 ![image](static/2.png)
