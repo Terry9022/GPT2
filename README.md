@@ -5,6 +5,17 @@ Use GPT2 model to do abstraction-based summarization on traditional Chinese arti
 Application: automatically generate summary or news title based on input content. 
 
 -------------
+## Usage
+### apis
+```shell
+uvicorn api:app --port <port> --host 0.0.0.0
+```
+- demo page: `http://<your_ip>:<port>/generate_summary`
+- api doc page: `http://<your_ip>:<port>/docs`
+### cli
+```shell
+python -m cli  # use --help to get help
+```
 ## File Outline and Explanation
 
 ### Folder 
@@ -47,16 +58,15 @@ Input are train_text.txt and train_label.txt. Output are train_data.json and tes
 
 -train.py : GPT2 model training file.
 
--generate_title.py : According to trained model, use it to generate the title based on the article content.
+-cli.py : According to trained model, use it to generate the title based on the article content.
 
--main.py :  FastAPI Demo. Port is 7000.
+-apis.py :  FastAPI Demo. Port is 7000.
 
 ------
 ### Application example
+![image](static/1.png)
 
-![image](https://github.com/Terryb06109022/GPT2/blob/main/1.png)
+![image](static/2.png)
 
-![image](https://github.com/Terryb06109022/GPT2/blob/main/2.png)
-
-![image](https://github.com/Terryb06109022/GPT2/blob/main/3.png)
+![image](static/3.png)
 
